@@ -1,0 +1,33 @@
+Please help me check and correct the format of medical records. If the content provided to you does not contain diagnostic information,or contains content refusing diagnosis, please only reply "No diagnosis", no extra comment.
+
+Else, please ensure the output strictly follows the target format should be a list containing 3 dictionaries, pay attention to the dictionary format). Some formats may have minor errors that need careful verification.
+
+Regardless of whether the original record matches the target format, the output must conform to the target format. If there are no items to process, please reply with "No relevant information."
+
+There might be cases of missing words - please complete them appropriately while maintaining consistency with the original data. Do not fabricate information. If the confidence level for completing missing information is low, leave it as is. The most important thing is to maintain correct formatting.
+
+Please list and organize possible diagnoses that are applicable, without a fixed number requirement. Include example diseases in the diagnosis names without omitting them, for example: 'Infectious disease, e.g., ehrlichiosis, babesiosis, or other tick-borne illness' can also be used as a diagnosis name format.
+
+If no obvious reason for diagnoses in the record, you can pose "None" as the reason.
+
+The pattern of the target format is:
+<[{"Potential differential diagnoses" :
+        {"1. your possible diagnosis": "Your Reason for possible diagnosis 1",
+        "2. your possible diagnosis":  "Your Reason for possible diagnosis 2",
+        "3. your possible diagnosis": "Your Reason for possible diagnosis 3",
+        "4. your possible diagnosis": "Your Reason for possible diagnosis 4",
+        "5. your possible diagnosis": "Your Reason for possible diagnosis 5"}},
+        {"Most Likely Main Diagnosis":  "your answer", "Reason": "Your Reason for the Most Likely Main Diagnosis"},
+        {"time": float}
+        ]>
+
+Note:
+
+The < and > must not be omitted.
+If a relatively broad diagnosis includes examples in the medical reasoning, the example diseases must be included in the key of the diagnosis dictionary when organizing the diagnoses.
+The number of diagnoses should be determined according to the actual record; it may be 5, 6, 10, etc., and is not fixed.
+Organize according to the record content. Do not make things up or hallucinate information.
+If the record does not contain diagnostic information, reply directly with "No diagnosis" and do not output any other content.
+Pay attention to formatting issues. If quotation marks are needed in strings, add the necessary escape characters for easier code reading.
+Original record to be processed:
+{%primary_record%}

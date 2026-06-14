@@ -1,0 +1,16 @@
+{
+  "expected_query_rows": 942,
+  "bias_analysis_min_dirs_full": 200,
+  "bias_analysis_target_dirs": 289,
+  "dataset_dirs": {
+    "challenge": "dataset/Challenge_Dataset",
+    "sdoh": "dataset/SDoH_Dataset",
+    "query_active": "dataset/question/query_question.xlsx",
+    "query_full_backup": "dataset/question/query_question.full.xlsx"
+  },
+  "bias_analysis_candidates": [
+    "../results/bias_analysis_second_gpt5_bias_diagnosis",
+    "../results/bias_analysis_second_gpt5_偏见诊断",
+    "results/bias_analysis_second_gpt5_bias_diagnosis"
+  ]
+}

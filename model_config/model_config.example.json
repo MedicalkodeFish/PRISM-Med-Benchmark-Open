@@ -1,0 +1,337 @@
+{
+    "defaults": {
+        "classification_model": "gpt-5.4",
+        "checker_model_list": [
+            "gpt-5.4-nano",
+            "gemini-3-flash-preview"
+        ]
+    },
+    "aliases": [
+        {
+            "id": "o3-mini-check",
+            "model_id": "o3-mini-all",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gpt-5.4-nano",
+            "model_id": "gpt-5.4-nano",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gpt-5.5",
+            "model_id": "gpt-5.5",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-3.5-flash",
+            "model_id": "gemini-3.5-flash",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-2.5-pro-preview",
+            "model_id": "gemini-2.5-pro",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gpt-5.4",
+            "model_id": "gpt-5.4",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-2.5-flash-check",
+            "model_id": "gemini-2.5-flash",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-2.0-flash-check-lite",
+            "model_id": "gemini-2.5-flash-lite",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-2.5-flash-check-lite",
+            "model_id": "gemini-2.5-flash-lite",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-3-flash-check",
+            "model_id": "gemini-3-flash-preview",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-2.0-pro-exp-02-05",
+            "model_id": "gemini-2.0-pro-exp-02-05",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "claude-3-7-sonnet-thinking",
+            "model_id": "claude-3-7-sonnet-20250219-thinking",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "deepseek-r1",
+            "model_id": "deepseek-r1-250120",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "deepseek-v3-check",
+            "model_id": "deepseek-v3-0324",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-2.5-pro-check",
+            "model_id": "gemini-2.5-pro",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-2.5-pro-classification",
+            "model_id": "gemini-2.5-pro-exp-03-25",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "o4-mini-classification",
+            "model_id": "o4-mini",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "claude-sonnet-4",
+            "model_id": "claude-sonnet-4-20250514",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        }
+    ],
+    "models": [
+        {
+            "id": "doubao-seed-1-6-250615",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "claude-sonnet-4-5-20250929",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-1.5-pro-002",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-2.5-flash",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-2.5-pro",
+            "model_id": "gemini-2.5-pro",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-3-flash-preview",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "glm-4.5",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gpt-3.5-turbo-0613",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gpt-4o-2024-11-20",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gpt-5-2025-08-07",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gpt-5.1",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gpt-5.1-high",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gpt-5-high",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "deepseek-v3.2-thinking",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "grok-4.1",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gpt-5-mini-2025-08-07",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gpt-5-nullo-2025-08-07",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "grok-4",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "grok-3",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "kimi-k2-0711-preview",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "o1-2024-12-17",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "o3-2025-04-16",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "o3-pro-2025-06-10",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "o4-mini-2025-04-16",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "claude-3-opus-20240229",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "claude-opus-4-20250514",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "claude-opus-4-1-20250805",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "qwen3-235b-a22b",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "claude-3-5-sonnet-20241022",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "claude-3-7-sonnet-20250219",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "claude-sonnet-4-20250514",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "o3-mini-2025-01-31",
+            "api_key": null,
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "o1-mini-2024-09-12",
+            "api_key": null,
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "claude-3-5-haiku-20241022",
+            "api_key": null,
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "claude-3-haiku-20240307",
+            "api_key": null,
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "claude-3-sonnet-20240229",
+            "api_key": null,
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "deepseek-r1-250528",
+            "api_key": null,
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "deepseek-v3-250324",
+            "api_key": null,
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "deepseek-v3-1-250821",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-3-pro-preview",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gemini-3.1-pro-preview",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "gpt-5.4",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        },
+        {
+            "id": "claude-opus-4-6",
+            "api_key": "YOUR_API_KEY_HERE",
+            "url": "https://api.openai.com/v1"
+        }
+    ]
+}

@@ -1,0 +1,79 @@
+{
+  "legacy_root": "..",
+  "python_executable": "python",
+  "steps": [
+    {
+      "id": "base_ask",
+      "enabled": true,
+      "entrypoint": "prism_benchmark.stages.base_ask_stage:run",
+      "description": "Run 3-round base generation and checker extraction"
+    },
+    {
+      "id": "classification",
+      "enabled": true,
+      "entrypoint": "prism_benchmark.stages.classification_stage:run_round_classification",
+      "description": "Run per-round classification adjudication"
+    },
+    {
+      "id": "classification_summary",
+      "enabled": true,
+      "entrypoint": "prism_benchmark.stages.classification_stage:run_summary_classification",
+      "description": "Run summary classification for each round"
+    },
+    {
+      "id": "reasoning_flaws",
+      "enabled": true,
+      "entrypoint": "prism_benchmark.stages.reasoning_stage:run_reasoning_flaws",
+      "description": "Run reasoning flaw analysis per round"
+    },
+    {
+      "id": "reasoning_flaws_summary",
+      "enabled": true,
+      "entrypoint": "prism_benchmark.stages.reasoning_stage:run_reasoning_flaws_summary",
+      "description": "Run two-judge summary for flaws per round"
+    },
+    {
+      "id": "bias_ask",
+      "enabled": true,
+      "entrypoint": "prism_benchmark.stages.sdoh_stage:run_bias_ask",
+      "description": "Run 3-round SDoH-context prompting and checker extraction"
+    },
+    {
+      "id": "bias_classification",
+      "enabled": true,
+      "entrypoint": "prism_benchmark.stages.sdoh_stage:run_bias_classification",
+      "description": "Run scenario1/scenario2 classification for SDoH branch"
+    },
+    {
+      "id": "base_count",
+      "enabled": true,
+      "entrypoint": "prism_benchmark.stages.metrics_stage:run_base_count",
+      "description": "Count bias-direction diagnoses on original branch (3 rounds)"
+    },
+    {
+      "id": "bias_count",
+      "enabled": true,
+      "entrypoint": "prism_benchmark.stages.sdoh_stage:run_bias_count",
+      "description": "Count bias-direction diagnoses on SDoH branch (3 rounds)"
+    },
+    {
+      "id": "bias_metrics",
+      "enabled": true,
+      "entrypoint": "prism_benchmark.stages.metrics_stage:run_bias_metrics",
+      "description": "Compute IR/SSR and related SDoH metrics"
+    },
+    {
+      "id": "classification_vote",
+      "enabled": true,
+      "entrypoint": "prism_benchmark.stages.metrics_stage:run_classification_vote",
+      "description": "Majority-vote classification and build score input table"
+    },
+    {
+      "id": "composite_score",
+      "enabled": true,
+      "entrypoint": "prism_benchmark.stages.metrics_stage:run_composite_score",
+      "description": "Compute composite benchmark score by fixed formula"
+    }
+  ]
+}
+

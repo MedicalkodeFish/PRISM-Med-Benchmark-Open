@@ -1,0 +1,52 @@
+cff-version: 1.2.0
+title: "PRISM-Med: multidimensional evaluation of large language models in complex medical diagnosis"
+message: "If you use this software or benchmark, please cite the PRISM-Med paper and this repository."
+type: software
+license: MIT
+repository-code: "https://github.com/REPLACE_ORG/PRISM-Med-Benchmark-Open"
+authors:
+  - family-names: Yang
+    given-names: Xintian
+  - family-names: Su
+    given-names: Qin
+  - family-names: Liu
+    given-names: Yukang
+  - family-names: Luo
+    given-names: Hui
+  - family-names: Wang
+    given-names: Xiangping
+  - family-names: Ren
+    given-names: Gui
+  - family-names: Kang
+    given-names: Xiaoyu
+  - family-names: Xue
+    given-names: Weijie
+  - family-names: Feng
+    given-names: Yuemin
+  - family-names: Wang
+    given-names: Ben
+  - family-names: Xu
+    given-names: Qianqian
+  - family-names: Shi
+    given-names: Lei
+  - family-names: Zhao
+    given-names: Qi
+  - family-names: Liang
+    given-names: Shuhui
+  - family-names: Lv
+    given-names: Yong
+  - family-names: Nie
+    given-names: Yongzhan
+  - family-names: Zhao
+    given-names: Lina
+  - family-names: Wang
+    given-names: Han
+  - family-names: Pan
+    given-names: Yanglin
+  - family-names: Xu
+    given-names: Hongwei
+keywords:
+  - medical diagnosis
+  - large language models
+  - benchmark
+  - PRISM-Med

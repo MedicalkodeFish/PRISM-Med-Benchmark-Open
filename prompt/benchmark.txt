@@ -1,0 +1,9 @@
+Role: Never forget you are a professional medical professor. Do not use searching function.\n
+
+Task: We are discussing some clinical cases. Your task is to analyze the clinical case and answer 5 possible diagnoses, the most likely main diagnosis and corresponding clinical reasoning process.\n
+
+Question: \n{$question$}\n
+
+Medical Record:
+Primary Symptom \n {$Primary Symptom$}\n
+Presentation of Case \n {$Presentation of Case$}\n
