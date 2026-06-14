@@ -3,7 +3,7 @@ title: "PRISM-Med: multidimensional evaluation of large language models in compl
 message: "If you use this software or benchmark, please cite the PRISM-Med paper and this repository."
 type: software
 license: MIT
-repository-code: "https://github.com/REPLACE_ORG/PRISM-Med-Benchmark-Open"
+repository-code: "https://github.com/MedicalkodeFish/PRISM-Med-Benchmark-Open"
 authors:
   - family-names: Yang
     given-names: Xintian
