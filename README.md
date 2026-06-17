@@ -4,6 +4,8 @@
 
 This repository implements the **PRISM-Med** benchmark: challenge-set diagnostics, reasoning reliability, and SDoH bias combined into a composite score (`Benchmark_Score_100`).
 
+We **continuously update** the public **model leaderboard** as new evaluations complete, and **open-source additional benchmark datasets** over time. Watch this repository for refreshed figures, tables, and `dataset/` releases.
+
 All commands below assume your shell’s current directory is **this repository root** (the folder that contains `run_prism_benchmark.py`).
 
 ## Overview
@@ -20,7 +22,7 @@ Three pillars feed a composite `Benchmark_Score_100`. Full step list: [docs/BENC
 
 ### Model leaderboard (reference run)
 
-Illustrative rankings from a completed PRISM-Med evaluation (reproduce locally with the pipeline below).
+Illustrative rankings from a completed PRISM-Med evaluation (reproduce locally with the pipeline below). **This leaderboard is a snapshot** — we plan to refresh it as more models are evaluated; dataset coverage will also grow in future releases.
 
 <p align="center">
   <img src="img/benchmark_scores.png" alt="PRISM-Med model score leaderboard" width="900">
@@ -68,10 +70,10 @@ If you use this benchmark or code, please cite:
 Example BibTeX (add journal/conference fields and DOI when available):
 
 ```bibtex
-@article{yang2025prismmed,
+@article{yang2026prismmed,
   title   = {PRISM-Med: multidimensional evaluation of large language models in complex medical diagnosis},
   author  = {Yang, Xintian and Su, Qin and Liu, Yukang and Luo, Hui and Wang, Xiangping and Ren, Gui and Kang, Xiaoyu and Xue, Weijie and Feng, Yuemin and Wang, Ben and Xu, Qianqian and Shi, Lei and Zhao, Qi and Liang, Shuhui and Lv, Yong and Nie, Yongzhan and Zhao, Lina and Wang, Han and Pan, Yanglin and Xu, Hongwei},
-  year    = {2025},
+  year    = {2026},
   note    = {Benchmark code and data: see repository README and CITATION.cff}
 }
 ```
