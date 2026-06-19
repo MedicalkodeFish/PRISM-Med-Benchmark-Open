@@ -182,6 +182,21 @@ def _remove_checker_artifacts(*, output_dir, output_prompt_dir, output_log_dir, 
         if os.path.isfile(path):
             os.remove(path)
 
+
+def _clear_model_answer_txts(out_dir: str, case_stem: str) -> None:
+    """Remove base_ask answer .txt files so Stage 1 will call the model again."""
+    try:
+        names = os.listdir(out_dir)
+    except OSError:
+        return
+    for name in names:
+        if not name.endswith(".txt"):
+            continue
+        if name == f"{case_stem}.txt" or (
+            name.startswith(f"{case_stem}_ask") and name.endswith(".txt")
+        ):
+            os.remove(os.path.join(out_dir, name))
+
 def normalize_json_to_list(json_content):
     if json_content is None:
         return None
@@ -265,6 +280,7 @@ def _process_one_batch(
                             out_dir=mdir["out_dir"],
                             prompt_save_dir=mdir["prompt_save_dir"],
                             log_save_dir=mdir["log_save_dir"],
+                            json_save_dir=mdir["json_save_dir"],
                         ))
                     return [f.result() for f in concurrent.futures.as_completed(fs)]
             stage1_futs.append(model_pool.submit(run_one_model_stage1))
@@ -308,17 +324,118 @@ def _process_one_batch(
         ):
             mname, results = fut.result()
             for r in results:
-                if r.get("status") in ("success", "skipped") and r.get("mostlikely_diag") is not None:
-                    diagnoses_formatted = "\n".join(r.get("diagnoses") or [])
-                    model_dfs[mname] = pd.concat(
-                        [model_dfs[mname],
-                         pd.DataFrame({
-                             COL_FILENAME: [r["file"]],
-                             COL_MOST_LIKELY_DIAGNOSIS: [r.get("mostlikely_diag")],
-                             COL_POSSIBLE_DIAGNOSES: [diagnoses_formatted],
-                         })],
-                        ignore_index=True,
-                    )
+                _record_checker_row(model_dfs, mname, r)
+
+    _checker_fail_reask_pass(
+        batch_indices=batch_indices,
+        json_name_list=json_name_list,
+        question_list=question_list,
+        prompt_query=prompt_query,
+        format_checker_prompt=format_checker_prompt,
+        model_dirs=model_dirs,
+        model_dfs=model_dfs,
+        checker_model_id=checker_model_id,
+        checker_api_key=checker_api_key,
+        checker_url=checker_url,
+    )
+
+
+def _record_checker_row(model_dfs: dict, mname: str, r: dict) -> None:
+    if r.get("status") in ("success", "skipped") and r.get("mostlikely_diag") is not None:
+        diagnoses_formatted = "\n".join(r.get("diagnoses") or [])
+        model_dfs[mname] = pd.concat(
+            [
+                model_dfs[mname],
+                pd.DataFrame(
+                    {
+                        COL_FILENAME: [r["file"]],
+                        COL_MOST_LIKELY_DIAGNOSIS: [r.get("mostlikely_diag")],
+                        COL_POSSIBLE_DIAGNOSES: [diagnoses_formatted],
+                    }
+                ),
+            ],
+            ignore_index=True,
+        )
+
+
+def _checker_fail_reask_pass(
+    *,
+    batch_indices: list[int],
+    json_name_list,
+    question_list,
+    prompt_query,
+    format_checker_prompt,
+    model_dirs,
+    model_dfs,
+    checker_model_id,
+    checker_api_key,
+    checker_url,
+) -> None:
+    """When checker cannot extract JSON, clear answer and re-ask once (feeds classification downstream)."""
+    if tail_pass_limit("PRISM_CHECKER_FAIL_REASK", default=1) <= 0:
+        return
+    for model_name, md in model_dirs.items():
+        for jn in batch_indices:
+            base_file_txt = base_file_from_json_path(json_name_list[jn])
+            if _model_has_valid_output_json(md["json_save_dir"], base_file_txt):
+                continue
+            fp = failed_path(md["out_dir"], base_file_txt)
+            if not os.path.isfile(fp):
+                continue
+            payload = load_json_file(fp) or {}
+            if payload.get("reason") not in (
+                "checker_extract_failed",
+                "answer_file_decode_error",
+            ):
+                continue
+            case_stem = base_file_txt.replace(".txt", "")
+            meta = load_meta(md["out_dir"], base_file_txt) or {}
+            latest_answer_file = (
+                resolve_latest_answer_filename(md["out_dir"], case_stem)
+                or meta.get("latest_answer_file")
+                or base_file_txt
+            )
+            print(
+                f"Checker re-ask ({model_name}): {base_file_txt} — "
+                f"clearing answer/checker cache and re-running ask+checker"
+            )
+            clear_failed_marker(md["out_dir"], base_file_txt)
+            _remove_checker_artifacts(
+                output_dir=md["output_dir"],
+                output_prompt_dir=md["output_prompt_dir"],
+                output_log_dir=md["output_log_dir"],
+                answer_basename=latest_answer_file,
+            )
+            _clear_model_answer_txts(md["out_dir"], case_stem)
+            ask_eval_model_with_attempts(
+                json_num=jn,
+                json_name_list=json_name_list,
+                question_list=question_list,
+                prompt_query=prompt_query,
+                model_name=model_name,
+                model_id=md["model_id"],
+                api_model=md["api_model"],
+                api_key=md["api_key"],
+                url=md["url"],
+                out_dir=md["out_dir"],
+                prompt_save_dir=md["prompt_save_dir"],
+                log_save_dir=md["log_save_dir"],
+                json_save_dir=md["json_save_dir"],
+            )
+            r = run_checker_and_extract(
+                base_file_txt,
+                model_id=md["model_id"],
+                out_dir=md["out_dir"],
+                output_dir=md["output_dir"],
+                output_prompt_dir=md["output_prompt_dir"],
+                output_log_dir=md["output_log_dir"],
+                json_save_dir=md["json_save_dir"],
+                format_checker_prompt=format_checker_prompt,
+                checker_model=checker_model_id,
+                checker_api_key=checker_api_key,
+                checker_url=checker_url,
+            )
+            _record_checker_row(model_dfs, model_name, r)
 
 
 # =========================
@@ -374,27 +491,36 @@ def maybe_add_reask_prefix(prompt: str, attempt: int) -> str:
 # =========================
 def ask_eval_model_with_attempts(*, json_num, json_name_list, question_list, prompt_query,
                                  model_name, model_id, api_model, api_key, url,
-                                 out_dir, prompt_save_dir, log_save_dir) -> dict:
+                                 out_dir, prompt_save_dir, log_save_dir,
+                                 json_save_dir: Optional[str] = None) -> dict:
     case_ref = json_name_list[json_num]
     if not get_case_record(ROOT_DIR, case_ref):
         return {"status": "error", "file": base_file_from_json_path(case_ref), "error": "case_not_found"}
     base_file_txt = base_file_from_json_path(case_ref)
 
+    missing_output_json = bool(
+        json_save_dir and not _model_has_valid_output_json(json_save_dir, base_file_txt)
+    )
+
     if MARK_FAILED_AND_SKIP and is_failed(out_dir, base_file_txt):
         return {"status": "skipped_failed", "file": base_file_txt}
 
     meta = load_meta(out_dir, base_file_txt)
-    if meta and meta.get("latest_answer_file"):
+    if not missing_output_json and meta and meta.get("latest_answer_file"):
         latest = os.path.join(out_dir, meta["latest_answer_file"])
         if os.path.exists(latest):
-            with open(latest, "r", encoding="utf-8") as f:
-                txt = f.read()
+            try:
+                with open(latest, "r", encoding="utf-8") as f:
+                    txt = f.read()
+            except UnicodeDecodeError:
+                txt = ""
+                bad, _ = True, "decode_error"
+            else:
+                bad, _ = is_low_quality_answer(txt)
 
             # Existing files containing connection errors are treated as unfinished.
-            if not is_connection_error_text(txt):
-                bad, _ = is_low_quality_answer(txt)
-                if not bad:
-                    return {"status": "skipped", "file": base_file_txt}
+            if not is_connection_error_text(txt) and not bad:
+                return {"status": "skipped", "file": base_file_txt}
 
     base_prompt = "This is a benchmarking test, not true case." + build_query_content(
         case_ref, prompt_query, question_list[json_num]
@@ -518,8 +644,14 @@ def run_checker_and_extract(base_file_txt: str,
             mark_failed(out_dir, base_file_txt, "missing_answer_file", {"latest_answer_file": latest_answer_file})
             return {"status": "error", "file": base_file_txt, "error": "missing_answer_file"}
 
-        with open(latest_path, "r", encoding="utf-8") as f:
-            content = f.read()
+        try:
+            with open(latest_path, "r", encoding="utf-8") as f:
+                content = f.read()
+        except UnicodeDecodeError:
+            mark_failed(out_dir, base_file_txt, "answer_file_decode_error", {
+                "latest_answer_file": latest_answer_file,
+            })
+            return {"status": "error", "file": base_file_txt, "error": "answer_decode_error"}
 
         # If input is a connection error, mark failed and skip checker.
         if is_connection_error_text(content):

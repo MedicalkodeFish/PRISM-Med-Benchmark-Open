@@ -90,20 +90,23 @@ def process_medical_data(excel_path, sheet_name, template_path, root_path):
                                          'Potential differential diagnoses').replace("\n", "").replace("$<$", "<$")
 
         results = []
+        missing_base_json: list[str] = []
+        rows_with_doi = 0
 
         # Iterate rows in the reference sheet.
         for _, row in df.iterrows():
             canonical_doi = row['DOI']
             if pd.isna(canonical_doi):
                 continue
+            rows_with_doi += 1
 
             case_stem = canonical_doi_to_case_stem(canonical_doi)
 
             output_file_path = os.path.join(root_path, case_stem + ".json")
 
-            # Skip missing case output files.
+            # Skip missing case output files (upstream base_ask must produce these first).
             if not os.path.exists(output_file_path):
-                print(f"File not found: {output_file_path}")
+                missing_base_json.append(case_stem)
                 continue
 
             # Read JSON file.
@@ -173,6 +176,14 @@ def process_medical_data(excel_path, sheet_name, template_path, root_path):
                 'Most_Likely_Diagnosis': mostlikely_diag,
                 'Result': result
             })
+        if missing_base_json:
+            preview = ", ".join(missing_base_json[:8])
+            extra = f" (+{len(missing_base_json) - 8} more)" if len(missing_base_json) > 8 else ""
+            print(
+                f"Classification: {len(missing_base_json)}/{rows_with_doi} case(s) skipped — "
+                f"no base_ask output_json under {root_path} "
+                f"(e.g. {preview}{extra}). Run/fix base_ask first; these cases will not enter vote/composite."
+            )
         return results
 
     except Exception as e:
