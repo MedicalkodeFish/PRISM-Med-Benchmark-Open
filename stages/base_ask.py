@@ -31,6 +31,7 @@ from tqdm import tqdm
 
 from extract_json_from_txt import extract_content, extract_diagnoses
 from benchmark_paths import path_base_ask_progress_file, path_base_ask_round_dirs, path_base_ask_round_xlsx
+from base_ask_answer_paths import resolve_latest_answer_filename
 from base_ask_progress import (
     BASE_ASK_BATCH_SIZE as BATCH_SIZE,
     build_progress_payload,
@@ -62,7 +63,7 @@ from benchmark_column_names import (
 )
 from model_config import resolve_model
 from ask_llm_client import chat_LLM_base_ask as chat_LLM
-from llm_connection_utils import is_connection_error_text
+from llm_connection_utils import is_connection_error_text, is_unusable_checker_response
 
 # =========================
 # Paths and configuration
@@ -167,6 +168,19 @@ def mark_failed(out_dir: str, base_file_txt: str, reason: str, extra: Optional[d
         "extra": extra or {}
     }
     save_json_file(failed_path(out_dir, base_file_txt), payload)
+
+
+def clear_failed_marker(out_dir: str, base_file_txt: str) -> None:
+    fp = failed_path(out_dir, base_file_txt)
+    if os.path.isfile(fp):
+        os.remove(fp)
+
+
+def _remove_checker_artifacts(*, output_dir, output_prompt_dir, output_log_dir, answer_basename: str) -> None:
+    for folder in (output_dir, output_prompt_dir, output_log_dir):
+        path = os.path.join(folder, answer_basename)
+        if os.path.isfile(path):
+            os.remove(path)
 
 def normalize_json_to_list(json_content):
     if json_content is None:
@@ -493,7 +507,12 @@ def run_checker_and_extract(base_file_txt: str,
                 pass
 
         meta = load_meta(out_dir, base_file_txt) or {}
-        latest_answer_file = meta.get("latest_answer_file", base_file_txt)
+        case_stem = base_file_txt.replace(".txt", "")
+        latest_answer_file = (
+            resolve_latest_answer_filename(out_dir, case_stem)
+            or meta.get("latest_answer_file")
+            or base_file_txt
+        )
         latest_path = os.path.join(out_dir, latest_answer_file)
         if not os.path.exists(latest_path):
             mark_failed(out_dir, base_file_txt, "missing_answer_file", {"latest_answer_file": latest_answer_file})
@@ -507,6 +526,15 @@ def run_checker_and_extract(base_file_txt: str,
             mark_failed(out_dir, base_file_txt, "missing_valid_answer_due_to_connection_error",
                         {"latest_answer_file": latest_answer_file})
             return {"status": "error", "file": base_file_txt, "error": "connection_error_in_answer"}
+
+        if is_failed(out_dir, base_file_txt):
+            _remove_checker_artifacts(
+                output_dir=output_dir,
+                output_prompt_dir=output_prompt_dir,
+                output_log_dir=output_log_dir,
+                answer_basename=latest_answer_file,
+            )
+            clear_failed_marker(out_dir, base_file_txt)
 
         for _ in range(CHECKER_MAX_RETRIES):
             prompt_content = format_checker_prompt.replace("{%primary_record%}", content)
@@ -524,6 +552,16 @@ def run_checker_and_extract(base_file_txt: str,
             # Retry checker when it returns connection errors.
             if is_connection_error_text(result):
                 time.sleep(5)
+                continue
+
+            if is_unusable_checker_response(result):
+                _remove_checker_artifacts(
+                    output_dir=output_dir,
+                    output_prompt_dir=output_prompt_dir,
+                    output_log_dir=output_log_dir,
+                    answer_basename=latest_answer_file,
+                )
+                time.sleep(CHECKER_BACKOFF_SEC)
                 continue
 
             json_content = extract_content(result)
@@ -546,6 +584,7 @@ def run_checker_and_extract(base_file_txt: str,
             try:
                 with open(json_file_path, "w", encoding="utf-8") as f:
                     json.dump(formatted_json, f, ensure_ascii=False, indent=4)
+                clear_failed_marker(out_dir, base_file_txt)
                 return {"status": "success", "file": base_file_txt,
                         "mostlikely_diag": mostlikely_diag, "diagnoses": diagnoses}
             except Exception:

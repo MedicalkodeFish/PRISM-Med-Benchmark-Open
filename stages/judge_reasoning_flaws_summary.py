@@ -16,6 +16,7 @@ from benchmark_paths import (
     path_model_ask_result_dir,
     path_model_flaws_summary_dir,
 )
+from base_ask_answer_paths import iter_case_stems_with_answer, read_answer_analysis
 from reasoning_flaws_aggregate import process_flaws_summary_json_file
 from reasoning_flaws_constants import HALLUCINATION_TYPES, apply_windows_proactor_event_loop_policy
 from legacy_script_config import (
@@ -99,14 +100,10 @@ async def process_summary(
             print(f"Failed to load eval2 for {case_id}: {str(e)}. Skipping.")
             return
         
-        # Load original analysis (from original txt)
-        original_txt_path = os.path.join(result_dir, f"{case_id}.txt")
-        with open(original_txt_path, "r", encoding="utf-8") as f:
-            analysis = f.read()
-            lines = analysis.splitlines()
-            if lines and (lines[-1].startswith("total_elapsed_sec:") or "总耗时" in lines[-1]):
-                lines = lines[:-1]
-            analysis = '\n'.join(lines)
+        analysis = read_answer_analysis(result_dir, case_id)
+        if not analysis:
+            print(f"Skipping {case_id}: no readable base_ask answer under {result_dir}")
+            return
         
         case_record = ""
         true_diagnosis = ""
@@ -212,11 +209,7 @@ async def main_async():
             flaws_dirs = flaws_dirs_for_model_runs(model, ask_num, run_list)
             if not os.path.exists(result_dir):
                 continue
-            txt_files = [
-                f.replace(".txt", "")
-                for f in os.listdir(result_dir)
-                if f.endswith(".txt") and f.replace(".txt", "") in allowed_cases
-            ]
+            case_ids = iter_case_stems_with_answer(result_dir, sorted(allowed_cases))
 
             sem = asyncio.Semaphore(max_workers)
             tasks = [
@@ -233,7 +226,7 @@ async def main_async():
                     LLM_model,
                     temperature,
                 )
-                for case_id in txt_files
+                for case_id in case_ids
             ]
             await asyncio.gather(*tasks)
 

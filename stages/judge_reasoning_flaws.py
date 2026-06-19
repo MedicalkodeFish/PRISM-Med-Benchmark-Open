@@ -19,6 +19,11 @@ from benchmark_paths import (
     path_model_ask_result_dir,
     path_model_flaws_dir,
 )
+from base_ask_answer_paths import (
+    iter_case_stems_with_answer,
+    read_answer_analysis,
+    resolve_latest_answer_filename,
+)
 from reasoning_flaws_aggregate import process_flaws_json_file
 from reasoning_flaws_json import parse_reasoning_audit_from_full_record, parse_reasoning_audit_response
 from legacy_script_config import (
@@ -74,15 +79,12 @@ def save_full_llm_return(full_out_path, prompt, model_name, temperature, respons
         json.dump(payload, f, ensure_ascii=False, indent=4)
 
 
-async def process_file(txt_file, sem, result_dir, flaws_dir, dict_basename_to_path, ROOT_DIR, prompt_template, LLM_model, temperature):
+async def process_case(case_stem, sem, result_dir, flaws_dir, dict_basename_to_path, ROOT_DIR, prompt_template, LLM_model, temperature):
     async with sem:
-        print(f"\nProcessing file: {txt_file}")
-        txt_path = os.path.join(result_dir, txt_file)
-
-        # Check if flaws files already exist
-        flaws_txt_path = os.path.join(flaws_dir, txt_file.replace(".txt", "_flaws.txt"))
-        flaws_json_path = os.path.join(flaws_dir, txt_file.replace(".txt", "_flaws.json"))
-        flaws_full_path = os.path.join(flaws_dir, txt_file.replace(".txt", "_flaws_full.json"))
+        print(f"\nProcessing case: {case_stem}")
+        flaws_txt_path = os.path.join(flaws_dir, f"{case_stem}_flaws.txt")
+        flaws_json_path = os.path.join(flaws_dir, f"{case_stem}_flaws.json")
+        flaws_full_path = os.path.join(flaws_dir, f"{case_stem}_flaws_full.json")
 
         if not os.path.exists(flaws_json_path) and os.path.exists(flaws_full_path):
             recovered = parse_reasoning_audit_from_full_record(flaws_full_path)
@@ -94,30 +96,23 @@ async def process_file(txt_file, sem, result_dir, flaws_dir, dict_basename_to_pa
 
         if os.path.exists(flaws_txt_path):
             if os.path.exists(flaws_json_path):
-                print(f"Skipping {txt_file} as both flaws.txt and flaws.json exist.")
+                print(f"Skipping {case_stem} as both flaws.txt and flaws.json exist.")
                 return
             with open(flaws_txt_path, "r", encoding="utf-8") as f:
                 response = f.read()
             if write_flaws_json(flaws_json_path, response):
                 print(f"Extracted and saved JSON from existing {flaws_txt_path}")
                 return
-            print(f"Failed to extract JSON from {flaws_txt_path}; proceeding to regenerate via LLM for {txt_file}")
+            print(f"Failed to extract JSON from {flaws_txt_path}; proceeding to regenerate via LLM for {case_stem}")
 
-        try:
-            with open(txt_path, "r", encoding="utf-8") as f:
-                analysis = f.read()
-                lines = analysis.splitlines()
-                if lines and (lines[-1].startswith("total_elapsed_sec:") or "总耗时" in lines[-1]):
-                    lines = lines[:-1]
-                analysis = '\n'.join(lines)
-        except OSError as e:
-            print(f"Error opening file {txt_path}: {str(e)}. Skipping this file.")
+        analysis = read_answer_analysis(result_dir, case_stem)
+        if not analysis:
+            answer_name = resolve_latest_answer_filename(result_dir, case_stem)
+            print(f"No readable answer for {case_stem} (expected under {result_dir}, got {answer_name!r}). Skipping.")
             return
 
-        # Find corresponding json path
-        basename = txt_file.replace(".txt", "")
-        if basename in dict_basename_to_path:
-            json_rel_path = dict_basename_to_path[basename]
+        if case_stem in dict_basename_to_path:
+            json_rel_path = dict_basename_to_path[case_stem]
             dict_content = get_case_record(ROOT_DIR, json_rel_path)
             if dict_content:
                 try:
@@ -128,14 +123,12 @@ async def process_file(txt_file, sem, result_dir, flaws_dir, dict_basename_to_pa
                                             .replace("{{CASE_RECORD}}", case_record) \
                                             .replace("{{TRUE_DIAGNOSIS}}", true_diagnosis)
 
-                    # Save prompt
-                    prompt_out_path = os.path.join(flaws_dir, txt_file.replace(".txt", "_flaws_prompt.txt"))
+                    prompt_out_path = os.path.join(flaws_dir, f"{case_stem}_flaws_prompt.txt")
                     with open(prompt_out_path, "w", encoding="utf-8") as f:
                         f.write(prompt)
                     print(f"Saved prompt: {prompt_out_path}")
 
-                    # Call LLM for analysis
-                    print(f"Calling LLM for {txt_file}")
+                    print(f"Calling LLM for {case_stem}")
                     llm_result = await async_chat_claude(prompt, LLM_model, temperature)
 
                     response = ""
@@ -150,13 +143,11 @@ async def process_file(txt_file, sem, result_dir, flaws_dir, dict_basename_to_pa
                         response = str(llm_result)
                         raw_result = llm_result
 
-                    # Save to original text path, keeping original format unchanged
-                    out_path = os.path.join(flaws_dir, txt_file.replace(".txt", "_flaws.txt"))
+                    out_path = os.path.join(flaws_dir, f"{case_stem}_flaws.txt")
                     with open(out_path, "w", encoding="utf-8") as f:
                         f.write(response)
                     print(f"Saved flaws.txt: {out_path}")
 
-                    # Additional save: complete LLM return info
                     try:
                         save_full_llm_return(
                             full_out_path=flaws_full_path,
@@ -168,23 +159,22 @@ async def process_file(txt_file, sem, result_dir, flaws_dir, dict_basename_to_pa
                         )
                         print(f"Saved full LLM return: {flaws_full_path}")
                     except Exception as e:
-                        print(f"Failed to save full LLM return for {txt_file}: {str(e)}")
+                        print(f"Failed to save full LLM return for {case_stem}: {str(e)}")
 
-                    json_out_path = os.path.join(flaws_dir, txt_file.replace(".txt", "_flaws.json"))
-                    if write_flaws_json(json_out_path, response):
-                        print(f"Saved flaws.json: {json_out_path}")
+                    if write_flaws_json(flaws_json_path, response):
+                        print(f"Saved flaws.json: {flaws_json_path}")
                     else:
                         print(
-                            f"Failed to parse response as JSON for {txt_file}; "
+                            f"Failed to parse response as JSON for {case_stem}; "
                             f"see {flaws_full_path} for raw output"
                         )
                 except OSError as e:
-                    print(f"Error processing case record for {txt_file}: {str(e)}. Skipping this file.")
+                    print(f"Error processing case record for {case_stem}: {str(e)}. Skipping.")
                     return
             else:
                 print(f"Case record not found for: {json_rel_path}")
         else:
-            print(f"Basename not found in mapping: {basename}")
+            print(f"Basename not found in mapping: {case_stem}")
 
 
 async def main_async():
@@ -220,16 +210,25 @@ async def main_async():
                     print(f"Result directory not found: {result_dir}. Creating it now.")
                     os.makedirs(result_dir, exist_ok=True)
 
-                txt_files = [
-                    f
-                    for f in os.listdir(result_dir)
-                    if f.endswith(".txt") and f.replace(".txt", "") in allowed_cases
-                ]
-                total_files = len(txt_files)
-                print(f"Processing model: {model} for round: {ask_num}_flaws{run} ({total_files} files)")
+                case_stems = iter_case_stems_with_answer(result_dir, sorted(allowed_cases))
+                total_files = len(case_stems)
+                print(f"Processing model: {model} for round: {ask_num}_flaws{run} ({total_files} cases)")
 
                 sem = asyncio.Semaphore(max_workers)
-                tasks = [process_file(txt_file, sem, result_dir, flaws_dir, dict_basename_to_path, ROOT_DIR, prompt_template, LLM_model, temperature) for txt_file in txt_files]
+                tasks = [
+                    process_case(
+                        case_stem,
+                        sem,
+                        result_dir,
+                        flaws_dir,
+                        dict_basename_to_path,
+                        ROOT_DIR,
+                        prompt_template,
+                        LLM_model,
+                        temperature,
+                    )
+                    for case_stem in case_stems
+                ]
                 # Gather with return_exceptions to capture errors
                 results = await asyncio.gather(*tasks, return_exceptions=True)
                 for res in results:

@@ -53,3 +53,29 @@ def response_has_failure_keywords(text: str) -> bool:
         return False
     lower = text.lower()
     return any(keyword in lower for keyword in RESPONSE_FAILURE_KEYWORDS)
+
+
+def strip_llm_timing_footer(text: str) -> str:
+    lines = (text or "").splitlines()
+    if lines and (
+        lines[-1].startswith("total_elapsed_sec:")
+        or lines[-1].startswith("Total time:")
+        or "总耗时" in lines[-1]
+    ):
+        lines = lines[:-1]
+    return "\n".join(lines)
+
+
+def is_unusable_checker_response(text: str) -> bool:
+    """True when checker output cannot yield diagnosis JSON (retry-worthy)."""
+    body = strip_llm_timing_footer(text or "").strip()
+    if not body:
+        return True
+    lower = body.lower()
+    if lower in ("no diagnosis", "none", "n/a"):
+        return True
+    if len(body) < 32 and "no diagnosis" in lower:
+        return True
+    if is_connection_error_text(body):
+        return True
+    return False

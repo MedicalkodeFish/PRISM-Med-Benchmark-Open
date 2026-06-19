@@ -18,6 +18,8 @@ if str(LEGACY_ROOT / "lib") not in sys.path:
     sys.path.insert(0, str(LEGACY_ROOT / "lib"))
 
 from legacy_script_config import BASE_ASK_MODEL_LIST, ROUND_NUM_LIST  # noqa: E402
+from benchmark_paths import path_base_ask_round_dirs  # noqa: E402
+from base_ask_answer_paths import load_case_meta  # noqa: E402
 from base_ask_progress import (  # noqa: E402
     BASE_ASK_BATCH_SIZE,
     load_progress,
@@ -30,6 +32,21 @@ def _round_dirs(model_id: str, round_num: str) -> Path:
     return LEGACY_ROOT / "benchmark" / "result" / model_id / round_num
 
 
+def _clear_checker_for_stem(model_id: str, round_num: str, stem: str, *, dry_run: bool) -> None:
+    dirs = path_base_ask_round_dirs(model_id, round_num)
+    out_dir = dirs["out_dir"]
+    meta = load_case_meta(out_dir, stem) or {}
+    answer_file = meta.get("latest_answer_file") or f"{stem}.txt"
+    for key in ("output_dir", "output_prompt_dir", "output_log_dir"):
+        path = Path(dirs[key]) / answer_file
+        if not path.is_file():
+            continue
+        if dry_run:
+            print(f"[dry-run] would remove checker artifact {path}")
+        else:
+            path.unlink(missing_ok=True)
+
+
 def clear_failures(model_id: str, round_num: str, *, dry_run: bool) -> int:
     out_dir = _round_dirs(model_id, round_num)
     if not out_dir.is_dir():
@@ -39,6 +56,7 @@ def clear_failures(model_id: str, round_num: str, *, dry_run: bool) -> int:
     for failed in sorted(out_dir.glob("*.failed.json")):
         stem = failed.name.replace(".failed.json", "")
         meta = out_dir / f"{stem}.meta.json"
+        _clear_checker_for_stem(model_id, round_num, stem, dry_run=dry_run)
         if dry_run:
             print(f"[dry-run] would remove {failed.name}" + (f" + {meta.name}" if meta.exists() else ""))
         else:

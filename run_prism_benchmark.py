@@ -136,6 +136,9 @@ def _rollback_progress_one_batch(round_num: str) -> None:
 
 
 def _auto_clear_base_ask_failures(model_ids: list[str]) -> int:
+    from benchmark_paths import path_base_ask_round_dirs
+    from base_ask_answer_paths import load_case_meta
+
     _, _, round_num_list = _config_imports()
     total = 0
     for mid in model_ids:
@@ -144,9 +147,15 @@ def _auto_clear_base_ask_failures(model_ids: list[str]) -> int:
             if not out_dir.is_dir():
                 continue
             n_round = 0
+            dirs = path_base_ask_round_dirs(mid, rnd)
             for failed in out_dir.glob("*.failed.json"):
                 stem = failed.name.replace(".failed.json", "")
                 meta = out_dir / f"{stem}.meta.json"
+                meta_data = load_case_meta(str(out_dir), stem) or {}
+                answer_file = meta_data.get("latest_answer_file") or f"{stem}.txt"
+                for key in ("output_dir", "output_prompt_dir", "output_log_dir"):
+                    artifact = Path(dirs[key]) / answer_file
+                    artifact.unlink(missing_ok=True)
                 failed.unlink(missing_ok=True)
                 meta.unlink(missing_ok=True)
                 n_round += 1
