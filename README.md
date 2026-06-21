@@ -10,16 +10,6 @@ All commands below assume your shell’s current directory is **this repository 
 
 ## Overview
 
-### Benchmark pipeline
-
-Three pillars feed a composite `Benchmark_Score_100`. Full step list: [docs/BENCHMARK.md](docs/BENCHMARK.md).
-
-<p align="center">
-  <img src="img/flowchart.png" alt="PRISM-Med benchmark pipeline flowchart" width="900">
-</p>
-
-<p align="center"><sub>High-resolution vector: <a href="img/flowchart.pdf">img/flowchart.pdf</a></sub></p>
-
 ### Model leaderboard (reference run)
 
 Illustrative rankings from a completed PRISM-Med evaluation (reproduce locally with the pipeline below). **This leaderboard is a snapshot** — we plan to refresh it as more models are evaluated; dataset coverage will also grow in future releases.
@@ -40,6 +30,7 @@ The figure above summarizes **PRISM-Med** composite scores (`Benchmark_Score_100
 | Claude-4.5-Sonnet | `claude-sonnet-4-5-20250929` | Anthropic |
 | DeepSeek-V3.1 | `deepseek-v3-1-250821` | DeepSeek |
 | DeepSeek-V3.2 | `deepseek-v3.2-thinking` | DeepSeek |
+| DeepSeek-V4 Pro | `deepseek-v4-pro` | DeepSeek |
 | Gemini-2.5-Flash | `gemini-2.5-flash` | Google |
 | Gemini-2.5-Pro | `gemini-2.5-pro` | Google |
 | Gemini-3-Pro | `gemini-3-pro-preview` | Google |
@@ -56,6 +47,16 @@ The figure above summarizes **PRISM-Med** composite scores (`Benchmark_Score_100
 | O4-mini | `o4-mini-2025-04-16` | OpenAI |
 
 Default subject models in `config/legacy_script_config.py` may list a subset for local runs; override with `PRISM_*_MODELS` or `--models` as documented in [docs/BENCHMARK.md](docs/BENCHMARK.md).
+
+### Benchmark pipeline
+
+Three pillars feed a composite `Benchmark_Score_100`. Full step list: [docs/BENCHMARK.md](docs/BENCHMARK.md).
+
+<p align="center">
+  <img src="img/flowchart.png" alt="PRISM-Med benchmark pipeline flowchart" width="900">
+</p>
+
+<p align="center"><sub>High-resolution vector: <a href="img/flowchart.pdf">img/flowchart.pdf</a></sub></p>
 
 **License:** [MIT License](LICENSE) applies to **software and documentation in this repository**. **Clinical case text** in `dataset/` remains subject to **original publisher copyright** — see [dataset/README.md](dataset/README.md). Machine-readable citation metadata: [CITATION.cff](CITATION.cff).
 
