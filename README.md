@@ -1,8 +1,12 @@
 # PRISM-Med Benchmark
 
+**Languages:** [English](README.md) · [中文](README.zh-CN.md) · [Français](README.fr.md) · [Español](README.es.md)
+
+**PRISM-Med is a multi-dimensional benchmark for the comprehensive evaluation of large language models (LLMs) and AI agents** in complex clinical reasoning and diagnosis—not a single accuracy number, but aligned pillars that stress-test real-world medical AI behavior.
+
 **PRISM-Med: multidimensional evaluation of large language models in complex medical diagnosis**
 
-This repository implements the **PRISM-Med** benchmark: challenge-set diagnostics, reasoning reliability, and SDoH bias combined into a composite score (`Benchmark_Score_100`).
+This repository implements the **PRISM-Med** benchmark: challenge-set diagnostics, reasoning reliability, and SDoH (social determinants of health) bias are combined into a composite score (`Benchmark_Score_100`), suitable for comparing models and agentic pipelines on equal footing.
 
 We **continuously update** the public **model leaderboard** as new evaluations complete, and **open-source additional benchmark datasets** over time. Watch this repository for refreshed figures, tables, and `dataset/` releases.
 
