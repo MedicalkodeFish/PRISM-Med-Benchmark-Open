@@ -8,6 +8,16 @@
 
 Este repositorio implementa el benchmark **PRISM-Med**: diagnóstico en un conjunto de casos desafiantes, fiabilidad del razonamiento y sesgo en determinantes sociales de la salud (SDoH) se combinan en una puntuación compuesta (`Benchmark_Score_100`), apta para comparar modelos y flujos agenticos en igualdad de condiciones.
 
+### Protocolo de evaluación (ejecuciones de referencia)
+
+La tabla pública y las puntuaciones al estilo del artículo usan un protocolo fijo de **tres repeticiones**:
+
+1. **Tres pasadas independientes por caso** — cada modelo sujeto responde **tres veces** los mismos casos (ids de ronda `1_5answer`, `1_5answer_1`, `1_5answer_2` en `config/legacy_script_config.py`), incluidas las ramas de desafío y SDoH cuando corresponda.
+2. **Clasificación diagnóstica → voto mayoritario** — tras el juicio por ronda del Top-1 y de las listas diferenciales frente a la referencia, **las etiquetas a nivel de caso se fusionan por mayoría entre las tres rondas** (etapa `classification_vote`). La precisión/cobertura del pilar 1 y las entradas de puntuación usan esas etiquetas votadas.
+3. **Clasificación de fallos de razonamiento → agregación directa** — las auditorías del contenido de razonamiento **no** se someten a voto; **las tres rondas se agregan directamente** (todas las clasificaciones de flaws de cada ronda entran en el conjunto fusionado), y las tasas de flaws severos del pilar 2 se calculan sobre esa vista combinada.
+
+La reproducción local sigue los mismos valores por defecto salvo que sobrescriba las listas de rondas con variables `PRISM_*` ([docs/BENCHMARK.md](docs/BENCHMARK.md)).
+
 **Actualizamos de forma continua** la **tabla de clasificación pública de modelos** conforme terminan nuevas evaluaciones y **publicamos progresivamente** conjuntos de datos adicionales. Siga este repositorio para figuras, tablas y lanzamientos en `dataset/`.
 
 Todos los comandos asumen que el directorio actual es la **raíz del repositorio** (carpeta que contiene `run_prism_benchmark.py`).

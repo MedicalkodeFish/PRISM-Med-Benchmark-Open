@@ -8,6 +8,16 @@
 
 This repository implements the **PRISM-Med** benchmark: challenge-set diagnostics, reasoning reliability, and SDoH (social determinants of health) bias are combined into a composite score (`Benchmark_Score_100`), suitable for comparing models and agentic pipelines on equal footing.
 
+### Evaluation protocol (reference runs)
+
+The public leaderboard and paper-style scores use a fixed **three-repetition** protocol:
+
+1. **Three independent runs per case** — each subject model answers the same cases **three times** (round ids `1_5answer`, `1_5answer_1`, `1_5answer_2` in `config/legacy_script_config.py`), including challenge-set and SDoH branches where applicable.
+2. **Diagnosis classification → majority vote** — after per-round judging of Top-1 and differential lists against the reference, **case-level diagnostic labels are merged by majority vote across the three rounds** (`classification_vote`). Pillar-1 accuracy/coverage and related score inputs use these voted labels.
+3. **Reasoning-flaw classification → direct pooling** — audits of reasoning content are **not** voted; the three rounds are **aggregated directly** (all per-round flaw classifications contribute to the pooled case set), and pillar-2 severe-reasoning rates are computed from that combined view.
+
+Local reproduction uses the same defaults unless you override round lists via `PRISM_*` env vars (see [docs/BENCHMARK.md](docs/BENCHMARK.md)).
+
 We **continuously update** the public **model leaderboard** as new evaluations complete, and **open-source additional benchmark datasets** over time. Watch this repository for refreshed figures, tables, and `dataset/` releases.
 
 All commands below assume your shell’s current directory is **this repository root** (the folder that contains `run_prism_benchmark.py`).

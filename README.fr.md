@@ -8,6 +8,16 @@
 
 Ce dépôt implémente le benchmark **PRISM-Med** : diagnostics sur un jeu de cas difficiles, fiabilité du raisonnement et biais liés aux déterminants sociaux de la santé (SDoH) sont agrégés en un score composite (`Benchmark_Score_100`), pour comparer modèles et pipelines agentiques à périmètre égal.
 
+### Protocole d’évaluation (exécutions de référence)
+
+Le classement public et les scores « article » suivent un protocole fixe en **trois répétitions** :
+
+1. **Trois passages indépendants par cas** — chaque modèle sujet répond **trois fois** aux mêmes cas (identifiants de tour `1_5answer`, `1_5answer_1`, `1_5answer_2` dans `config/legacy_script_config.py`), y compris les branches jeu de défi et SDoH le cas échéant.
+2. **Classification diagnostique → vote majoritaire** — après jugement par tour du Top-1 et des diagnostics différentiels par rapport à la référence, **les étiquettes au niveau cas sont fusionnées par vote majoritaire sur les trois tours** (étape `classification_vote`). Précision/couverture du pilier 1 et entrées de score associées reposent sur ces étiquettes votées.
+3. **Classification des défauts de raisonnement → agrégation directe** — les audits du contenu de raisonnement **ne** sont **pas** soumis au vote ; **les trois tours sont agrégés directement** (toutes les classifications de flaws de chaque tour contribuent à l’ensemble fusionné), et les taux de flaws sévères du pilier 2 sont calculés sur cette vue combinée.
+
+La reproduction locale utilise les mêmes valeurs par défaut, sauf surcharge des listes de tours via les variables `PRISM_*` ([docs/BENCHMARK.md](docs/BENCHMARK.md)).
+
 Nous **mettons à jour en continu** le **classement public des modèles** au fil des évaluations et **publions progressivement** des jeux de données supplémentaires. Surveillez ce dépôt pour les figures, tableaux et versions `dataset/` actualisés.
 
 Toutes les commandes ci-dessous supposent que le répertoire courant est la **racine du dépôt** (dossier contenant `run_prism_benchmark.py`).
