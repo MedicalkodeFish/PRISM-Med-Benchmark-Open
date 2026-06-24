@@ -86,7 +86,7 @@ Copyright y citas: [dataset/README.md](dataset/README.md).
 
 ## Cita
 
-El manuscrito que describe PRISM-Med está **en revisión por pares** en *npj Digital Medicine*. El artículo completo **aún no está** en un servidor de preprints (sin DOI de preprint). Hasta la publicación en la revista, cite **este repositorio** y el título y autores siguientes; añadiremos el DOI oficial tras la aceptación.
+El manuscrito que describe PRISM-Med está **en revisión por pares**. El artículo completo **aún no está** en un servidor de preprints (sin DOI de preprint). Hasta la publicación en la revista, cite **este repositorio** y el título y autores siguientes; añadiremos el DOI oficial tras la aceptación.
 
 El panel **Cite this repository** de GitHub lee [CITATION.cff](CITATION.cff).
 
@@ -95,7 +95,7 @@ Si utiliza este benchmark o código, cite:
 > **PRISM-Med: multidimensional evaluation of large language models in complex medical diagnosis**  
 > Xintian Yang¹*, Qin Su²*, Yukang Liu²*, Hui Luo², Xiangping Wang², Gui Ren², Xiaoyu Kang², Weijie Xue³, Yuemin Feng¹, Ben Wang¹, Qianqian Xu¹, Lei Shi¹, Qi Zhao¹, Shuhui Liang², Yong Lv², Yongzhan Nie², Lina Zhao⁴, Han Wang⁵‡, Yanglin Pan²‡, Hongwei Xu¹,⁶‡  
 > *Contribución igual. ‡Autores de correspondencia.  
-> *npj Digital Medicine* (en revisión por pares; sin preprint público).
+> En revisión por pares; sin preprint público.
 
 Ejemplo BibTeX (sustituya `note` por volumen/páginas/DOI tras la publicación):
 
@@ -103,9 +103,8 @@ Ejemplo BibTeX (sustituya `note` por volumen/páginas/DOI tras la publicación):
 @article{yang2026prismmed,
   title   = {PRISM-Med: multidimensional evaluation of large language models in complex medical diagnosis},
   author  = {Yang, Xintian and Su, Qin and Liu, Yukang and Luo, Hui and Wang, Xiangping and Ren, Gui and Kang, Xiaoyu and Xue, Weijie and Feng, Yuemin and Wang, Ben and Xu, Qianqian and Shi, Lei and Zhao, Qi and Liang, Shuhui and Lv, Yong and Nie, Yongzhan and Zhao, Lina and Wang, Han and Pan, Yanglin and Xu, Hongwei},
-  journal = {npj Digital Medicine},
   year    = {2026},
-  note    = {Under peer review at npj Digital Medicine; no preprint. Benchmark: https://github.com/MedicalkodeFish/PRISM-Med-Benchmark-Open}
+  note    = {Under peer review; no preprint. Benchmark: https://github.com/MedicalkodeFish/PRISM-Med-Benchmark-Open}
 }
 ```
 

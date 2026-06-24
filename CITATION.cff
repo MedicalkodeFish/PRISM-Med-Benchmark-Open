@@ -98,6 +98,5 @@ preferred-citation:
       given-names: Yanglin
     - family-names: Xu
       given-names: Hongwei
-  journal: "npj Digital Medicine"
   year: 2026
-  notes: "Under peer review at npj Digital Medicine; no public preprint or article DOI yet. Benchmark code and data at https://github.com/MedicalkodeFish/PRISM-Med-Benchmark-Open"
+  notes: "Under peer review; no public preprint or article DOI yet. Benchmark code and data at https://github.com/MedicalkodeFish/PRISM-Med-Benchmark-Open"

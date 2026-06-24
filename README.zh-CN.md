@@ -88,7 +88,7 @@ PRISM-Med 的评测病例由两部分构成（流程见下图与论文 Fig. 1）
 
 ## 引用
 
-说明 PRISM-Med 的配套论文目前在 *npj Digital Medicine* **同行评议**中；论文全文**尚未**在 bioRxiv、medRxiv 等预印本平台公开（无预印本 DOI）。在期刊正式发表前，请优先引用**本仓库**，并同时注明下列论文题目与作者；接收发表后我们会在此补充正式 DOI。
+说明 PRISM-Med 的配套论文目前**同行评议**中；论文全文**尚未**在 bioRxiv、medRxiv 等预印本平台公开（无预印本 DOI）。在期刊正式发表前，请优先引用**本仓库**，并同时注明下列论文题目与作者；接收发表后我们会在此补充正式 DOI。
 
 GitHub 仓库页右侧 **Cite this repository** 会读取 [CITATION.cff](CITATION.cff)（含软件条目与论文 preferred citation）。
 
@@ -97,7 +97,7 @@ GitHub 仓库页右侧 **Cite this repository** 会读取 [CITATION.cff](CITATIO
 > **PRISM-Med: multidimensional evaluation of large language models in complex medical diagnosis**  
 > Xintian Yang¹*, Qin Su²*, Yukang Liu²*, Hui Luo², Xiangping Wang², Gui Ren², Xiaoyu Kang², Weijie Xue³, Yuemin Feng¹, Ben Wang¹, Qianqian Xu¹, Lei Shi¹, Qi Zhao¹, Shuhui Liang², Yong Lv², Yongzhan Nie², Lina Zhao⁴, Han Wang⁵‡, Yanglin Pan²‡, Hongwei Xu¹,⁶‡  
 > *同等贡献。‡通讯作者。  
-> *npj Digital Medicine*（同行评议中；暂无公开预印本）。
+> 同行评议中；暂无公开预印本。
 
 BibTeX 示例（发表后请将 `note` 换为卷期页与 DOI）：
 
@@ -105,9 +105,8 @@ BibTeX 示例（发表后请将 `note` 换为卷期页与 DOI）：
 @article{yang2026prismmed,
   title   = {PRISM-Med: multidimensional evaluation of large language models in complex medical diagnosis},
   author  = {Yang, Xintian and Su, Qin and Liu, Yukang and Luo, Hui and Wang, Xiangping and Ren, Gui and Kang, Xiaoyu and Xue, Weijie and Feng, Yuemin and Wang, Ben and Xu, Qianqian and Shi, Lei and Zhao, Qi and Liang, Shuhui and Lv, Yong and Nie, Yongzhan and Zhao, Lina and Wang, Han and Pan, Yanglin and Xu, Hongwei},
-  journal = {npj Digital Medicine},
   year    = {2026},
-  note    = {Under peer review at npj Digital Medicine; no preprint. Benchmark: https://github.com/MedicalkodeFish/PRISM-Med-Benchmark-Open}
+  note    = {Under peer review; no preprint. Benchmark: https://github.com/MedicalkodeFish/PRISM-Med-Benchmark-Open}
 }
 ```
 
