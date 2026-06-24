@@ -2,7 +2,7 @@
 
 **Langues :** [English](README.md) · [中文](README.zh-CN.md) · [Français](README.fr.md) · [Español](README.es.md)
 
-**PRISM-Med est un benchmark multidimensionnel pour l’évaluation complète des grands modèles de langage (LLM) et des agents d’IA** en raisonnement clinique et diagnostic complexes — pas un seul score de précision, mais des piliers complémentaires qui testent le comportement des systèmes médicaux en conditions réalistes.
+**PRISM-Med est un benchmark multidimensionnel pour l’évaluation des grands modèles de langage (LLM) et des agents d’IA** en raisonnement clinique et diagnostic complexes — performance diagnostique, fiabilité du raisonnement et biais liés aux SDoH, sous un protocole commun.
 
 **PRISM-Med : évaluation multidimensionnelle des grands modèles de langage pour le diagnostic médical complexe**
 
@@ -13,8 +13,8 @@ Ce dépôt implémente le benchmark **PRISM-Med** : diagnostics sur un jeu de ca
 Le classement public et les scores « article » suivent un protocole fixe en **trois répétitions** :
 
 1. **Trois passages indépendants par cas** — chaque modèle sujet répond **trois fois** aux mêmes cas (identifiants de tour `1_5answer`, `1_5answer_1`, `1_5answer_2` dans `config/legacy_script_config.py`), y compris les branches jeu de défi et SDoH le cas échéant.
-2. **Classification diagnostique → vote majoritaire** — après jugement par tour du Top-1 et des diagnostics différentiels par rapport à la référence, **les étiquettes au niveau cas sont fusionnées par vote majoritaire sur les trois tours** (étape `classification_vote`). Précision/couverture du pilier 1 et entrées de score associées reposent sur ces étiquettes votées.
-3. **Classification des défauts de raisonnement → agrégation directe** — les audits du contenu de raisonnement **ne** sont **pas** soumis au vote ; **les trois tours sont agrégés directement** (toutes les classifications de flaws de chaque tour contribuent à l’ensemble fusionné), et les taux de flaws sévères du pilier 2 sont calculés sur cette vue combinée.
+2. **Classification diagnostique → vote majoritaire** — après jugement par tour du Top-1 et des diagnostics différentiels par rapport à la référence, **les étiquettes au niveau cas sont fusionnées par vote majoritaire sur les trois tours** (étape `classification_vote`). Précision/couverture sur le jeu de cas difficiles et entrées de score associées reposent sur ces étiquettes votées.
+3. **Classification des défauts de raisonnement → agrégation directe** — les audits du contenu de raisonnement **ne** sont **pas** soumis au vote ; **les trois tours sont agrégés directement** (toutes les classifications de flaws de chaque tour contribuent à l’ensemble fusionné), et les taux de flaws sévères de la partie « fiabilité du raisonnement » sont calculés sur cette vue combinée.
 
 La reproduction locale utilise les mêmes valeurs par défaut, sauf surcharge des listes de tours via les variables `PRISM_*` ([docs/BENCHMARK.md](docs/BENCHMARK.md)).
 
@@ -62,9 +62,19 @@ La figure résume les scores composites **PRISM-Med** (`Benchmark_Score_100`) po
 
 Les modèles par défaut dans `config/legacy_script_config.py` peuvent n’en lister qu’un sous-ensemble ; surchargez via `PRISM_*_MODELS` ou `--models` ([docs/BENCHMARK.md](docs/BENCHMARK.md)).
 
+### Jeux de données d’évaluation
+
+PRISM-Med repose sur deux ressources de cas liées (aperçu : article, Fig. 1) :
+
+**Challenging Case Dataset** — Sur 1 672 rapports de cas recueillis dans *NEJM* et les revues du *JAMA Network*, 730 cas ont été exclus après criblage par des cliniciens ; **942** cas restent (oncologie 269, maladies infectieuses 159, troubles génétiques ou congénitaux 140, toxiques/médicamenteux ou iatrogènes 74, traumatiques/mécaniques 59, vasculaires 39, autres 66 ; Fig. 2A). En mode complet : `dataset/question/query_question.xlsx` (942 lignes), catalogues sous `dataset/Challenge_Dataset/`.
+
+**Simulated SDoH Dataset** — **289** cas (~30,7 %) servent à évaluer les biais liés aux SDoH, avec **578** scénarios contre-factuels appariés (profils SDoH moins vs plus favorisés) : congruents profil moins favorisé (89), congruents profil plus favorisé (88), neutres SDoH (112) ; Fig. 2B. Listes : `dataset/SDoH_Dataset/` ; les étapes de comptage exigent en local l’arborescence `bias_analysis_*` (~289 dossiers) — [docs/BENCHMARK.md](docs/BENCHMARK.md).
+
+Droits d’auteur et citations : [dataset/README.md](dataset/README.md).
+
 ### Pipeline du benchmark
 
-Trois piliers alimentent le score composite `Benchmark_Score_100`. Liste complète des étapes : [docs/BENCHMARK.md](docs/BENCHMARK.md).
+Le score `Benchmark_Score_100` combine **performance diagnostique** sur le jeu difficile, **taux de flaws de raisonnement sévères** et **indicateurs de biais SDoH** (p. ex. IR, SSR). Douze étapes au total ; détails et mode SDoH partiel : [docs/BENCHMARK.md](docs/BENCHMARK.md).
 
 <p align="center">
   <img src="img/flowchart.png" alt="Schéma du pipeline PRISM-Med" width="900">
@@ -100,7 +110,7 @@ Exemple BibTeX (ajoutez revue/conférence et DOI lors de la publication) :
 | Listes et catalogues sous `dataset/` (942 requêtes en mode complet) | Sorties LLM sous `benchmark/result/` |
 | Prompts (`prompt/`), règles de classification, table de biais (`benchmark/reference_table_bias_with_doi.xlsx`) | Manifestes sous `prism_benchmark/runs/` |
 | Code du pipeline (`stages/`, `lib/`, `prism_benchmark/`) | Classeur de scores jusqu’à la fin du pipeline |
-| Modèle de config API (`model_config/model_config.example.json`) | Arborescence complète du **pilier 3** (`bias_analysis_*`, ~289 dossiers) — [docs/BENCHMARK.md](docs/BENCHMARK.md) |
+| Modèle de config API (`model_config/model_config.example.json`) | Arborescence de prétraitement SDoH complète (`bias_analysis_*`, ~289 dossiers) — [docs/BENCHMARK.md](docs/BENCHMARK.md) |
 
 **Données cliniques :** les vignettes renvoient aux cas **NEJM** / **JAMA** via **DOI**. Lisez [dataset/README.md](dataset/README.md) avant toute redistribution.
 
@@ -126,7 +136,7 @@ Copy-Item .\model_config\model_config.example.json .\model_config\model_config.j
 # Éditez model_config\model_config.json (ne commitez pas les clés).
 ```
 
-3. **Prévol (sans appels API)** — sans données pilier 3 `bias_analysis_*` (~289 dossiers), autorisez le SDoH partiel pour les piliers 1–2 :
+3. **Prévol (sans appels API)** — sans `bias_analysis_*` pour la branche SDoH (~289 dossiers), vous pouvez n’exécuter que diagnostic + raisonnement (mode SDoH partiel) :
 
 ```powershell
 $env:PRISM_ALLOW_PARTIAL_SDOH = "1"
@@ -148,14 +158,14 @@ $env:PRISM_COUNT_TARGET_MODELS = "gpt-5.5,gemini-3.5-flash"
 
    Modèles juge : `model_config.json` et variables `PRISM_REASONING_LLM_MODEL`, `PRISM_COUNT_MODEL` ([docs/BENCHMARK.md](docs/BENCHMARK.md)).
 
-5. **Score trois piliers (style article)** — fournissez `bias_analysis_*` externe, sans `PRISM_ALLOW_PARTIAL_SDOH`. 12 étapes, sonde API, coût/temps possibles :
+5. **Score composite complet (avec SDoH, style article)** — fournissez `bias_analysis_*` externe, sans `PRISM_ALLOW_PARTIAL_SDOH`. 12 étapes, sonde API, coût/temps possibles :
 
 ```powershell
 Remove-Item Env:PRISM_ALLOW_PARTIAL_SDOH -ErrorAction SilentlyContinue
 python .\run_prism_benchmark.py --no-pause
 ```
 
-   **Piliers 1–2 seulement :** `$env:PRISM_ALLOW_PARTIAL_SDOH = "1"` ou `--allow-partial-sdoh`.
+   **Diagnostic + raisonnement seulement :** `$env:PRISM_ALLOW_PARTIAL_SDOH = "1"` ou `--allow-partial-sdoh`.
 
 6. **Sorties** (après succès) :
 
@@ -173,7 +183,7 @@ Plus d’infos : [docs/BENCHMARK.md](docs/BENCHMARK.md) · [PROJECT_LAYOUT.md](P
 
 | Objectif | Commande |
 |----------|----------|
-| Vérification données / trois piliers | `python .\run_prism_benchmark.py --check-only --no-pause` |
+| Vérification des données et des actifs du pipeline | `python .\run_prism_benchmark.py --check-only --no-pause` |
 | Benchmark 12 étapes | `python .\run_prism_benchmark.py --no-pause` ou `run_prism_full_benchmark.bat` |
 | Restaurer requêtes et tables de référence | `python .\prism_benchmark\scripts\prepare_full_benchmark_data.py` |
 | Pipeline seul | `python .\prism_benchmark\scripts\run_pipeline.py --config .\prism_benchmark\configs\default.json` |
@@ -184,5 +194,5 @@ Guide : [docs/BENCHMARK.md](docs/BENCHMARK.md) · Arborescence : [PROJECT_LAYOUT
 
 - `run_prism_benchmark.py` — lanceur recommandé (prévol, sonde API, 12 étapes, tableau de complétion)
 - `prism_benchmark/scripts/run_pipeline.py` — pipeline piloté par config
-- `prism_benchmark/scripts/data_assets_check.py` — vérification des actifs trois piliers
+- `prism_benchmark/scripts/data_assets_check.py` — vérification des jeux de données et des trois modules d’évaluation (autonome)
 - `prism_benchmark/scripts/benchmark_verify.py` — vérification par étape (`list_missing_cases.py` l’enveloppe)

@@ -13,8 +13,8 @@
 公开排行榜与论文式得分采用统一的**三轮重复**规则：
 
 1. **每例三轮独立重复** — 每个受试模型对同一批病例**重复作答三次**（轮次 id 为 `1_5answer`、`1_5answer_1`、`1_5answer_2`，见 `config/legacy_script_config.py`），挑战集与 SDoH 分支在适用时同样按三轮执行。
-2. **诊断相关分类 → 多数投票** — 各轮由评判模型对照参考标准判定 Top-1 与鉴别诊断列表后，**在病例层面将三轮分类结果按多数票合并**（`classification_vote` 阶段）；第一支柱的准确率、覆盖率及相应得分输入均基于投票后的标签。
-3. **推理内容分类 → 直接汇总** — 对推理缺陷的审核**不做投票**；**将三轮结果直接汇总**（各轮 flaw 分类一并纳入合并后的病例视图），第二支柱的严重推理缺陷率在该汇总结果上计算。
+2. **诊断相关分类 → 多数投票** — 各轮由评判模型对照参考标准判定 Top-1 与鉴别诊断列表后，**在病例层面将三轮分类结果按多数票合并**（`classification_vote` 阶段）；挑战集诊断部分的准确率、覆盖率及相应得分输入均基于投票后的标签。
+3. **推理内容分类 → 直接汇总** — 对推理缺陷的审核**不做投票**；**将三轮结果直接汇总**（各轮 flaw 分类一并纳入合并后的病例视图），推理可靠性部分的严重推理缺陷率在该汇总结果上计算。
 
 本地复现默认遵循上述设置；可通过 `PRISM_*` 环境变量调整轮次列表，详见 [docs/BENCHMARK.md](docs/BENCHMARK.md)。
 
@@ -62,9 +62,21 @@
 
 本地默认受试模型列表见 `config/legacy_script_config.py`，可能仅为子集；可通过 `PRISM_*_MODELS` 或 `--models` 覆盖，详见 [docs/BENCHMARK.md](docs/BENCHMARK.md)。
 
+### 测试数据集
+
+PRISM-Med 的评测病例由两部分构成（流程见下图与论文 Fig. 1）：
+
+**挑战性病例集（Challenging Case Dataset）**  
+从 NEJM 与 JAMA Network 等期刊共收集 1,672 份病例报告，经医师团队按诊断难度筛选后排除 730 例，保留 **942** 例。病种分布较广，主要包括肿瘤学（269）、感染性疾病（159）、遗传或先天性疾病（140）、中毒/药物或医源性损害（74）、创伤或机械性病变（59）、血管疾病（39）及其他（66）（论文 Fig. 2A）。本仓库完整模式下，查询索引见 `dataset/question/query_question.xlsx`（942 行），病例目录与 DOI 见 `dataset/Challenge_Dataset/`。
+
+**模拟 SDoH 数据集（Simulated SDoH Dataset）**  
+在上述 942 例中，经多模型初筛与医师复核后纳入 **289** 例（约占 30.7%）用于评估与 SDoH 相关的偏倚风险。每例对应一对「资源较弱 / 资源较丰富」的 SDoH 反事实情景，合计 **578** 条情景。按金标准诊断与配对 SDoH 下刻板印象一致方向的关系，病例分为：与资源较弱情景一致（89）、与资源较丰富情景一致（88）、SDoH 中性（112）（论文 Fig. 2B）。列表见 `dataset/SDoH_Dataset/`；偏倚指标计数阶段另需本地 `bias_analysis_*` 预处理树（约 289 个病例目录），见 [docs/BENCHMARK.md](docs/BENCHMARK.md)。
+
+版权与引用说明见 [dataset/README.md](dataset/README.md)。
+
 ### 基准流水线
 
-三大支柱汇入综合分 `Benchmark_Score_100`。完整步骤：[docs/BENCHMARK.md](docs/BENCHMARK.md)。
+综合分 `Benchmark_Score_100` 由三类指标合成：**挑战集诊断表现**（Top-1 / Top-5 等）、**回答中的严重推理缺陷率**，以及 **SDoH 相关偏倚指标**（如 IR、SSR 等）。流水线共 12 个阶段，各步输入输出与可选的部分 SDoH 模式见 [docs/BENCHMARK.md](docs/BENCHMARK.md)。
 
 <p align="center">
   <img src="img/flowchart.png" alt="PRISM-Med 基准流水线示意图" width="900">
@@ -100,7 +112,7 @@ BibTeX 示例（正式发表后请补充期刊/会议与 DOI）：
 | `dataset/` 下病例列表与目录（完整模式 942 条挑战查询） | `benchmark/result/` 下的 LLM 输出 |
 | 提示词（`prompt/`）、分类规则、偏倚参考表（`benchmark/reference_table_bias_with_doi.xlsx`） | `prism_benchmark/runs/` 下的运行清单 |
 | 流水线代码（`stages/`、`lib/`、`prism_benchmark/`） | 流水线完成前的综合得分工作簿 |
-| API 配置模板（`model_config/model_config.example.json`） | 完整**第三支柱**预处理树（`bias_analysis_*`，约 289 个病例文件夹）——见 [docs/BENCHMARK.md](docs/BENCHMARK.md) |
+| API 配置模板（`model_config/model_config.example.json`） | SDoH 偏倚模块所需的完整预处理树（`bias_analysis_*`，约 289 个病例文件夹）——见 [docs/BENCHMARK.md](docs/BENCHMARK.md) |
 
 **临床数据：** 病例 vignette 通过 **DOI** 关联已发表的 **NEJM** / **JAMA** 等病例报告。再分发或复用病例文本前请阅读 [dataset/README.md](dataset/README.md)。
 
@@ -126,7 +138,7 @@ Copy-Item .\model_config\model_config.example.json .\model_config\model_config.j
 # 编辑 model_config\model_config.json（勿提交真实密钥）。
 ```
 
-3. **预检（不调用 API）**——若尚无第三支柱 `bias_analysis_*` 数据（约 289 个病例文件夹），可对支柱 1–2 启用部分 SDoH：
+3. **预检（不调用 API）**——若尚无 SDoH 分支的 `bias_analysis_*` 数据（约 289 个病例文件夹），可仅跑诊断与推理两部分（部分 SDoH 模式）：
 
 ```powershell
 $env:PRISM_ALLOW_PARTIAL_SDOH = "1"
@@ -148,14 +160,14 @@ $env:PRISM_COUNT_TARGET_MODELS = "gpt-5.5,gemini-3.5-flash"
 
    检查器/评判模型：在 `model_config.json` 中配置，并可设置 `PRISM_REASONING_LLM_MODEL`、`PRISM_COUNT_MODEL` 等（见 [docs/BENCHMARK.md](docs/BENCHMARK.md)）。
 
-5. **完整三支柱得分（论文式）**——提供外部 `bias_analysis_*`（junction 或 `PRISM_BIAS_ANALYSIS_ROOT`），并在**未**设置 `PRISM_ALLOW_PARTIAL_SDOH` 时运行。将执行全部 12 步、探测 API，耗时长且可能产生 API 费用：
+5. **完整综合分（含 SDoH，与论文一致）**——提供外部 `bias_analysis_*`（junction 或 `PRISM_BIAS_ANALYSIS_ROOT`），并在**未**设置 `PRISM_ALLOW_PARTIAL_SDOH` 时运行。将执行全部 12 步、探测 API，耗时长且可能产生 API 费用：
 
 ```powershell
 Remove-Item Env:PRISM_ALLOW_PARTIAL_SDOH -ErrorAction SilentlyContinue
 python .\run_prism_benchmark.py --no-pause
 ```
 
-   **仅支柱 1–2：** 保持 `$env:PRISM_ALLOW_PARTIAL_SDOH = "1"` 或使用 `python .\run_prism_benchmark.py --allow-partial-sdoh --no-pause`。
+   **仅诊断 + 推理：** 保持 `$env:PRISM_ALLOW_PARTIAL_SDOH = "1"` 或使用 `python .\run_prism_benchmark.py --allow-partial-sdoh --no-pause`。
 
 6. **输出**（成功运行后）：
 
@@ -173,7 +185,7 @@ python .\run_prism_benchmark.py --no-pause
 
 | 目标 | 命令 |
 |------|------|
-| 数据 / 三支柱检查 | `python .\run_prism_benchmark.py --check-only --no-pause`（见[快速开始](#快速开始)第 3 步） |
+| 数据与流水线资产检查 | `python .\run_prism_benchmark.py --check-only --no-pause`（见[快速开始](#快速开始)第 3 步） |
 | 完整 12 步基准 | `python .\run_prism_benchmark.py --no-pause` 或双击 `run_prism_full_benchmark.bat` |
 | 恢复完整查询与参考表 | `python .\prism_benchmark\scripts\prepare_full_benchmark_data.py` |
 | 仅流水线编排 | `python .\prism_benchmark\scripts\run_pipeline.py --config .\prism_benchmark\configs\default.json` |
@@ -184,5 +196,5 @@ python .\run_prism_benchmark.py --no-pause
 
 - `run_prism_benchmark.py` — 推荐启动器（预检、API 探测、12 步、完成表）
 - `prism_benchmark/scripts/run_pipeline.py` — 配置驱动流水线（无启动器附加功能）
-- `prism_benchmark/scripts/data_assets_check.py` — 三支柱资产检查（独立）
+- `prism_benchmark/scripts/data_assets_check.py` — 数据集与三模块资产检查（独立）
 - `prism_benchmark/scripts/benchmark_verify.py` — 分步产物校验（`list_missing_cases.py` 封装此工具）
