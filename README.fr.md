@@ -86,20 +86,26 @@ Le score `Benchmark_Score_100` combine **performance diagnostique** sur le jeu d
 
 ## Citation
 
+Le manuscrit décrivant PRISM-Med est **en cours d’évaluation par les pairs** dans *npj Digital Medicine*. Le texte intégral **n’est pas encore** déposé sur un serveur de preprints (pas de DOI de preprint). En attendant la publication, citez **ce dépôt** ainsi que le titre et les auteurs ci-dessous ; nous ajouterons le DOI officiel après acceptation.
+
+Le panneau **Cite this repository** sur GitHub lit [CITATION.cff](CITATION.cff).
+
 Si vous utilisez ce benchmark ou ce code, veuillez citer :
 
 > **PRISM-Med: multidimensional evaluation of large language models in complex medical diagnosis**  
 > Xintian Yang¹*, Qin Su²*, Yukang Liu²*, Hui Luo², Xiangping Wang², Gui Ren², Xiaoyu Kang², Weijie Xue³, Yuemin Feng¹, Ben Wang¹, Qianqian Xu¹, Lei Shi¹, Qi Zhao¹, Shuhui Liang², Yong Lv², Yongzhan Nie², Lina Zhao⁴, Han Wang⁵‡, Yanglin Pan²‡, Hongwei Xu¹,⁶‡  
-> *Contribution égale. ‡Auteurs correspondants.
+> *Contribution égale. ‡Auteurs correspondants.  
+> *npj Digital Medicine* (en évaluation par les pairs ; pas de preprint public).
 
-Exemple BibTeX (ajoutez revue/conférence et DOI lors de la publication) :
+Exemple BibTeX (remplacez `note` par volume/pages/DOI après publication) :
 
 ```bibtex
 @article{yang2026prismmed,
   title   = {PRISM-Med: multidimensional evaluation of large language models in complex medical diagnosis},
   author  = {Yang, Xintian and Su, Qin and Liu, Yukang and Luo, Hui and Wang, Xiangping and Ren, Gui and Kang, Xiaoyu and Xue, Weijie and Feng, Yuemin and Wang, Ben and Xu, Qianqian and Shi, Lei and Zhao, Qi and Liang, Shuhui and Lv, Yong and Nie, Yongzhan and Zhao, Lina and Wang, Han and Pan, Yanglin and Xu, Hongwei},
+  journal = {npj Digital Medicine},
   year    = {2026},
-  note    = {Benchmark code and data: see repository README and CITATION.cff}
+  note    = {Under peer review at npj Digital Medicine; no preprint. Benchmark: https://github.com/MedicalkodeFish/PRISM-Med-Benchmark-Open}
 }
 ```
 

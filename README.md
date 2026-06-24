@@ -86,20 +86,26 @@ Copyright and citation notes: [dataset/README.md](dataset/README.md).
 
 ## Citation
 
+The manuscript describing PRISM-Med is **under peer review** at *npj Digital Medicine*. The full paper is **not yet available** on a preprint server (no preprint DOI). Until journal publication, please cite **this repository** and the paper title and authors below; we will add the official DOI here after acceptance.
+
+GitHub’s **Cite this repository** sidebar reads [CITATION.cff](CITATION.cff) (software + preferred paper entry).
+
 If you use this benchmark or code, please cite:
 
 > **PRISM-Med: multidimensional evaluation of large language models in complex medical diagnosis**  
 > Xintian Yang¹*, Qin Su²*, Yukang Liu²*, Hui Luo², Xiangping Wang², Gui Ren², Xiaoyu Kang², Weijie Xue³, Yuemin Feng¹, Ben Wang¹, Qianqian Xu¹, Lei Shi¹, Qi Zhao¹, Shuhui Liang², Yong Lv², Yongzhan Nie², Lina Zhao⁴, Han Wang⁵‡, Yanglin Pan²‡, Hongwei Xu¹,⁶‡  
-> *Equal contribution. ‡Corresponding authors.
+> *Equal contribution. ‡Corresponding authors.  
+> *npj Digital Medicine* (under peer review; no public preprint yet).
 
-Example BibTeX (add journal/conference fields and DOI when available):
+Example BibTeX (replace `note` with volume/pages/DOI after publication):
 
 ```bibtex
 @article{yang2026prismmed,
   title   = {PRISM-Med: multidimensional evaluation of large language models in complex medical diagnosis},
   author  = {Yang, Xintian and Su, Qin and Liu, Yukang and Luo, Hui and Wang, Xiangping and Ren, Gui and Kang, Xiaoyu and Xue, Weijie and Feng, Yuemin and Wang, Ben and Xu, Qianqian and Shi, Lei and Zhao, Qi and Liang, Shuhui and Lv, Yong and Nie, Yongzhan and Zhao, Lina and Wang, Han and Pan, Yanglin and Xu, Hongwei},
+  journal = {npj Digital Medicine},
   year    = {2026},
-  note    = {Benchmark code and data: see repository README and CITATION.cff}
+  note    = {Under peer review at npj Digital Medicine; no preprint. Benchmark: https://github.com/MedicalkodeFish/PRISM-Med-Benchmark-Open}
 }
 ```
 
